@@ -1,0 +1,68 @@
+# This file is part of libertine linux's package zlib. It is subject to the license terms in the COPYRIGHT file found in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/zlib/master/COPYRIGHT. No part of libertine linux's package zlib, including this file, may be copied, modified, propagated, or distributed except according to the terms contained in the COPYRIGHT file.
+# Copyright © 2016 The developers of libertine linux's package zlib. See the COPYRIGHT file in the top-level directory of this distribution and at https://raw.githubusercontent.com/libertine-linux-packages/zlib/master/COPYRIGHT.
+
+
+variant=upstream
+
+depends build_ccache
+build_needs ccache
+
+depends build_gnumake
+build_needs make
+
+depends build_busybox
+build_needs cat date rm sed tee
+
+case "$package" in
+	
+	build_zlib)
+		
+		build_needs "$libertine_build"-cc "$libertine_build"-ar "$libertine_build"-ranlib "$libertine_build"-as "$libertine_build"-ld "$libertine_build"-strip
+		depends build_musl_cross_make_build
+		
+	;;
+	
+	zlib)
+		
+		build_needs "$libertine_host"-cc "$libertine_host"-ar "$libertine_host"-ranlib "$libertine_host"-as "$libertine_host"-ld "$libertine_host"-strip
+		depends build_musl_cross_make_host
+		
+	;;
+	
+esac
+
+libertine_compile_build_zlib()
+{
+	_libertine_compile_zlib_any "$libertine_buildIs64Bit" "$libertine_build" "$(libertine_public_outputBuildSysrootPath)" "$(libertine_public_buildCCompilerFlags)"
+}
+
+libertine_compile_zlib()
+{
+	_libertine_compile_zlib_any "$libertine_hostIs64Bit" "$libertine_host" "$(libertine_public_outputHostSysrootPath)" "$(libertine_public_hostCCompilerFlags)"
+}
+
+_libertine_compile_zlib_any()
+{
+	local is64Bit="$1"
+	local host="$2"
+	local outputFolderPath="$3"
+	local cFlags="$4"
+	
+	pushd "$(libertine_public_sourcePath)"
+		
+		set -- --static --prefix=/usr --uname=Linux
+		if $is64Bit; then
+			set -- "$@" --64
+		fi
+		
+		CHOST="$host" \
+		CC="ccache ${host}-cc $cFlags" \
+		./configure "$@"
+		
+		libertine_public_make static
+		
+		libertine_public_make DESTDIR="$outputFolderPath" install
+		
+		
+	popd
+}
