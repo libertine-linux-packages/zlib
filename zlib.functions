@@ -19,6 +19,11 @@ case "$package" in
 		
 		build_needs "$libertine_build"-cc "$libertine_build"-ar "$libertine_build"-ranlib "$libertine_build"-as "$libertine_build"-ld "$libertine_build"-strip
 		depends build_musl_cross_make_build
+
+		libertine_compile_build_zlib()
+		{
+			_libertine_compile_zlib_any "$libertine_buildIs64Bit" "$libertine_build" "$(libertine_public_outputBuildSysrootPath)" "$(libertine_public_buildCCompilerFlags)"
+		}
 		
 	;;
 	
@@ -27,19 +32,14 @@ case "$package" in
 		build_needs "$libertine_host"-cc "$libertine_host"-ar "$libertine_host"-ranlib "$libertine_host"-as "$libertine_host"-ld "$libertine_host"-strip
 		depends build_musl_cross_make_host
 		
+		libertine_compile_zlib()
+		{
+			_libertine_compile_zlib_any "$libertine_hostIs64Bit" "$libertine_host" "$(libertine_public_outputHostSysrootPath)" "$(libertine_public_hostCCompilerFlags)"
+		}
+		
 	;;
 	
 esac
-
-libertine_compile_build_zlib()
-{
-	_libertine_compile_zlib_any "$libertine_buildIs64Bit" "$libertine_build" "$(libertine_public_outputBuildSysrootPath)" "$(libertine_public_buildCCompilerFlags)"
-}
-
-libertine_compile_zlib()
-{
-	_libertine_compile_zlib_any "$libertine_hostIs64Bit" "$libertine_host" "$(libertine_public_outputHostSysrootPath)" "$(libertine_public_hostCCompilerFlags)"
-}
 
 _libertine_compile_zlib_any()
 {
