@@ -2,4 +2,3 @@
 	path = upstream
 	url = https://github.com/libertine-linux-clones/zlib.git
 	branch = master
-	libertine-linux-upstream = https://github.com/madler/zlib.git
